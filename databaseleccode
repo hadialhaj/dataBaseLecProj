@@ -1,0 +1,513 @@
+const express = require('express');
+const app = express();
+const port = 3000;
+const mongoose = require('mongoose');
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const url = 'mongodb://localhost:27017/hospitalDB';
+
+//patient schema
+const patient=new mongoose.Schema({
+    patientId:String ,
+    FirstName:String ,
+    LastName:String ,
+    Age:Number ,
+    Gender:String ,
+    Address:String ,
+    PhoneNumber:String ,
+    Email:String ,
+    MedicalHistory:[String],
+    date:{ type: Date, default: Date.now }
+    
+});
+//Doctor schema
+const doctor=new mongoose.Schema({
+    doctorId:String ,
+    FirstName:String ,
+    LastName:String ,
+    Age:Number ,
+    Gender:String ,
+    Address:String ,
+    PhoneNumber:String ,
+    Email:String ,
+    Specialization:String ,
+    dateOFJoining:{ type: Date, default: Date.now },
+    department:String
+});
+
+//appointment schema
+const appointment=new mongoose.Schema({
+    appointmentId:String ,
+    patientId:String ,
+doctorId:String ,
+    appointmentDate:Date ,
+    reasonForVisit:String ,
+    status:String ,
+    date:{ type: Date, default: Date.now },
+    room:String
+});
+//medical record schema
+const medicalRecord=new mongoose.Schema({
+    recordId:String ,
+    patientId:String ,
+    doctorId:String ,
+    diagnosis:String ,
+    treatment:String ,
+    prescriptions:[String],
+   visitdate:{ type: Date, default: Date.now }
+   ,medications:[String]
+});
+//department schema
+const department=new mongoose.Schema({
+    departmentId:String ,
+    name:String ,
+    location:String ,
+    headOfDepartment:String ,
+    contactNumber:String ,
+    date:{ type: Date, default: Date.now },
+    doctorID:String,
+    PhoneNumber:String,
+    isActive:Boolean
+});
+
+
+const Patient = mongoose.model('Patient', patient);
+const Doctor = mongoose.model('Doctor', doctor);
+const Appointment = mongoose.model('Appointment', appointment);
+const MedicalRecord = mongoose.model('MedicalRecord', medicalRecord);
+const Department = mongoose.model('Department', department);
+
+//insertion
+async function insertManyPatient() {
+    try {
+        const patients = [
+            {
+                 patientId:"P001" ,
+    FirstName:"John" ,
+    LastName:"Doe" ,
+    Age:30 ,
+    Gender:"Male" ,
+    Address:"123 Main St, Cityville" ,
+    PhoneNumber:"7080990" ,
+    Email:"johndoe@gmail.com" ,
+    MedicalHistory:["Diabetes", "Hypertension   "],
+    date: new Date()
+
+
+}
+,{
+  patientId:"P002" ,
+    FirstName:"Jana" ,
+    LastName:"Smith" ,
+    Age:25 ,
+    Gender:"Female" ,
+    Address:"456 Oak Ave, Townsville" ,
+    PhoneNumber:"809900" ,
+    Email:"janadmith@gmail.com" ,
+    MedicalHistory:["Asthma" ],
+    date: new Date()
+},
+{
+patientId:"P003" ,
+    FirstName:"james" ,
+    LastName:"white" ,
+    Age:45 ,
+    Gender:"Male" ,
+    Address:"789 Pine Rd, Villageburg" ,
+    PhoneNumber:"  909900" ,
+    Email:"jmeswhite112@gmail.com" ,
+    MedicalHistory:["Allergies", "Arthritis"],
+    date: new Date()
+
+}
+
+];
+await Patient.insertMany(patients);
+}
+
+
+catch(error){        console.error("Error inserting documents:", error);
+    }   
+
+}
+
+async function insertManydoctors() {
+   try{
+const Doctors=[
+    {
+      doctorId:"D001" ,
+    FirstName:"Emily" ,
+    LastName:"Johnson" ,
+    Age:40 ,
+    Gender:"Female" ,
+    Address:"321 Elm St, Metropolis" ,
+    PhoneNumber:"707070" ,
+    Email:"EmilyJohnson@gmail.com" ,
+    Specialization:"Cardiology" ,
+    dateOFJoining: new Date(),
+    department:"Cardiology  "
+   },
+   {
+
+  doctorId:"D002" ,
+    FirstName:"Michael" ,
+    LastName:"Brown" ,
+    Age:50 ,
+    Gender:"Male" ,
+    Address:"654 Maple Ave, Gotham" ,
+    PhoneNumber:"606060" ,
+    Email:"Michael1s@gmail.com" ,
+    Specialization:"Neurology" ,
+    dateOFJoining: new Date(),
+    department:"Neurology"
+
+   }
+,
+{
+doctorId:"D003" ,
+    FirstName:"Sarah" ,
+    LastName:"Davis" ,
+    Age:35,
+    Gender:"Female" ,
+    Address:"987 Cedar Rd, Star City" ,
+    PhoneNumber:"505050" ,
+    Email:"SarahDavis12@gmail.com" ,
+    Specialization:"Pediatrics" ,
+    dateOFJoining: new Date(),
+    department:"Pediatrics"
+}
+] ;   await Doctor.insertMany(Doctors);
+        
+        }catch(error){        console.error("Error inserting documents:", error);   }
+}
+
+async function insertMnyAppointment(){
+try{
+const Appointments= [
+    {
+      appointmentId:"A001" ,
+    patientId:"P001" ,
+doctorId:"D001" ,
+    appointmentDate:new Date('2024-07-15T10:00:00') ,
+    reasonForVisit:"Regular check-up" ,
+    status:"Scheduled" ,
+    date: new Date(),
+    room:"101"   
+
+
+
+},
+{
+ appointmentId:"A002" ,
+    patientId:"P002" ,
+doctorId:"D002" ,
+    appointmentDate:new Date('2024-07-16T14:30:00') ,
+    reasonForVisit:"Headache and dizziness" ,
+    status:"Completed" ,
+    date: new Date(),
+    room:"202"
+
+
+
+},
+{
+     appointmentId:"A003" ,
+    patientId:"P003" ,
+doctorId:"D003" ,
+    appointmentDate:new Date('2024-07-17T09:15:00') ,
+    reasonForVisit:"Child wellness exam" ,
+    status:"Cancelled" ,
+    date: new Date(),
+    room:"303"
+}
+
+];
+  await Appointment.insertMany(Appointments);
+}catch(error){        console.error("Error inserting documents:", error);   }   
+
+
+}
+
+async function insertManyMedicalRecord(){
+try{
+const MedicalRecords=[{
+ recordId:"MR001" ,
+    patientId:"P001" ,
+    doctorId:"D001" ,
+    diagnosis:"Type 2 Diabetes" ,
+    treatment:"Metformin 500mg daily" ,
+    prescriptions:["Metformin", "Insulin"],
+   visitdate: new Date()
+   ,medications:["Metformin", "Insulin"]
+
+
+
+
+},{
+     recordId:"MR002" ,
+    patientId:"P002" ,
+    doctorId:"D002" ,
+    diagnosis:"Chronic Migraine" ,
+    treatment:"Topiramate 25mg daily" ,
+    prescriptions:["Topiramate", "Sumatriptan"],
+   visitdate: new Date()
+   ,medications:["Topiramate", "Sumatriptan"]
+},{
+ recordId:"MR003" ,
+    patientId:"P003" ,
+    doctorId:"D003" ,
+    diagnosis:"Asthma" ,
+    treatment:  "Inhaled corticosteroids" ,
+    prescriptions:["Inhaled corticosteroids", "Albuterol"],
+   visitdate: new Date()
+   ,medications:["Inhaled corticosteroids", "Albuterol"]
+
+}]
+;
+  await MedicalRecord.insertMany(MedicalRecords);
+
+}
+catch(error){        console.error("Error inserting documents:", error);   }    
+
+
+
+
+
+}
+
+
+
+
+async function insertManydepartment(){
+try{
+const Departments=[{
+    departmentId:"DEP001" ,
+    name:"Cardiology" ,
+    location:"Building A, 2nd Floor" ,
+    headOfDepartment:"Dr. Emily Johnson" ,
+    contactNumber:"123-456-7890" ,
+   date: new Date(),
+    doctorID:"D001",
+    PhoneNumber:"707070",
+    isActive:true
+},{
+    departmentId:"DEP002" ,
+    name:"Neurology" ,
+    location:"Building B, 3rd Floor" ,
+    headOfDepartment:"Dr. Michael Brown" ,
+    contactNumber:"234-567-8901" ,
+   date: new Date(),
+    doctorID:"D002",
+    PhoneNumber:"606060",
+    isActive:true
+},{
+    departmentId:"DEP003" ,
+    name:"Pediatrics" ,
+    location:"Building C, 1st Floor" ,
+    headOfDepartment:"Dr. Sarah Davis" ,
+    contactNumber:"345-678-9012" ,
+date: new Date(),
+    doctorID:"D003",
+    PhoneNumber:"   505050",
+    isActive:true
+}]
+;
+const result = await Department.insertMany(Departments);
+        console.log(" Departments inserted successfully:", result.length);
+
+}
+catch(error){        console.error("Error inserting documents:", error);   }
+}
+
+async function updatePatient(patientId){
+
+try{
+    await Patient.findOneAndUpdate(
+        { patientId: patientId },{$set: { Address: "New york city" ,phoneNumber:"804055"}});
+    await Patient.findOneAndUpdate(
+       { patientId: patientId },{$set: { Address: "Los angeles" ,phoneNumber:"705055"}});
+    await Patient.findOneAndUpdate(
+        { patientId: patientId },{$set: { Address: "Chicago" ,phoneNumber:"809955"}});
+    console.log('Patient address updated successfully.');
+}catch(error){
+    console.error('Error updating patient address:', error);}
+
+
+}
+async function findByIdAndUpdate(departmentId){
+try{
+    await Department.findOneAndUpdate(
+ { departmentId: departmentId },{$set: { location: "Building D, 4th Floor" ,contactNumber:"456-789-0123"}});
+    await Department.findOneAndUpdate(
+{ departmentId: departmentId },{$set: { location: "Building E, 5th Floor" ,contactNumber:"567-890-1234"}});
+    await Department.findOneAndUpdate(
+{ departmentId: departmentId },{$set: { location: "Building F, 6th Floor" ,contactNumber:"678-901-2345"}});
+
+}
+catch(error){
+    console.error('Error updating document:', error);}
+}
+
+async function findByIdAndUpdateDepartment(departmentId){
+try{
+    await Department.findOneAndUpdate(
+{ departmentId: departmentId },{$set: { headOfDepartment: "Dr. Alice Williams" ,isActive:false}});
+    await Department.findOneAndUpdate(
+{ departmentId: departmentId },{$set: { headOfDepartment: "Dr. Robert Miller" ,isActive:false}});
+    await Department.findOneAndUpdate(
+{ departmentId: departmentId },{$set: { headOfDepartment: "Dr. Linda Wilson" ,isActive:false}}
+
+
+    );
+
+    }catch(error){
+    console.error('Error updating document:', error);}  }
+
+async function findByIdAndUpdateAppointment(appointmentId){
+try{
+    await Appointment.findOneAndUpdate(
+ { appointmentId: appointmentId },{$set: { status: "Completed" ,room:"404"}});
+    await Appointment.findOneAndUpdate(
+ { appointmentId: appointmentId },{$set: { status: "Cancelled" ,room:"505"}});
+    await Appointment.findOneAndUpdate(
+ { appointmentId: appointmentId },{$set: { status: "Scheduled" ,room:"606"}});
+    }catch(error){console.log("error");}}
+
+async function findbyidandreadpat(patientId){
+const found =await Patient.findOne({ patientId: patientId });
+try{
+    if(!found){
+        console.log("not found");
+    }else{
+        console.log("The patient is :",found);
+    }
+} catch(error){console.log("error");}
+
+
+}
+
+async function findbyidandreaddoc(doctorId){
+const found =await Doctor.findOne({ doctorId: doctorId });
+const f1 =await Doctor.findOne({ doctorId: doctorId });
+try{
+    if(!found||!f1){
+        console.log("not found");
+    }else{
+        console.log("The Doctor is :",found);
+        console.log("The Doctor is :",f1);
+    }
+} catch(error){console.log("error");}
+
+
+}
+
+async function findbyidandreaddep(departmentId){
+const found =await Department.findOne({ departmentId: departmentId });
+const f1 =await Department.findOne({ departmentId: departmentId });
+try{
+    if(!found||!f1){
+        console.log("not found");
+    }else{
+        console.log("The department is :",found);
+        console.log("The department is :",f1);
+    }
+} catch(error){console.log("error");}
+
+
+}
+
+async function findbyidandreadapp(appointmentId){
+const found =await Appointment.findOne({ appointmentId: appointmentId });
+const f1 =await Appointment.findOne({ appointmentId: appointmentId });
+try{
+    if(!found||!f1){
+        console.log("not found");
+    }else{
+        console.log("The appoinment is :",found);
+        console.log("The appoinment is :",f1);
+    }
+} catch(error){console.log("error");}
+
+
+}
+
+
+async function findbyidandreadmed(recordId){
+const found =await MedicalRecord.findOne({ recordId: recordId });
+const f1 =await MedicalRecord.findOne({ recordId: recordId });
+try{
+    if(!found||!f1){
+        console.log("not found");
+    }else{
+        console.log("The medical record is :",found);
+        console.log("The medical record is :",f1);
+    }
+} catch(error){console.log("error");}
+}
+
+async function deletebyidpatient(patientId){
+try{
+    await Patient.findOneAndDelete({ patientId: patientId });
+    console.log("Patient deleted successfully");
+}catch(error){console.log("error deleting patient");}   
+}
+async function deletebyiddoctor(doctorId){
+try{ 
+    await Doctor.findOneAndDelete({doctorId:doctorId});
+    console.log("Doctor deleted successfully");
+}catch(error){console.log("error deleting doctor");}
+}
+
+
+
+
+
+
+
+app.get('/', (req, res) => {
+    res.send('Welcome to the Express App with MongoDB!');
+});
+
+
+
+
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(url);
+        console.log('✅MongoDB connection successful!');
+        
+        app.listen(port, () => {
+            console.log(` Server running on port ${port}`);
+        });
+      await insertManyPatient();
+        await insertManydoctors();
+        await insertMnyAppointment();
+        await insertManyMedicalRecord();
+        await insertManydepartment();
+        
+        console.log("All data inserted successfully!");
+
+        
+        await updatePatient("P001");
+        await findByIdAndUpdateDepartment("DEP001");
+        await findByIdAndUpdateAppointment("A001");
+        await findbyidandreadpat("P001");  
+        await findbyidandreaddoc("D001");
+        await findbyidandreaddep("DEP001");  
+        await findbyidandreadapp("A001");   
+    
+        await findbyidandreadmed("MR001");
+              console.log("Testing deletion...");
+        await deletebyidpatient("P003");  
+        await deletebyiddoctor("D001");   
+    } catch (err) {
+        console.error('❌ MongoDB connection error:', err.message);
+        process.exit(1);
+    }
+};
+
+connectDB();
