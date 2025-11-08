@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
+const { boolean } = require('webidl-conversions');
 
 
 app.use(express.json());
@@ -73,12 +74,87 @@ const department=new mongoose.Schema({
     isActive:Boolean
 });
 
+//medication schema
+const Medications = new mongoose.Schema({
+    medicationId: String,
+    name: String,
+    type: String,
+    strength: String,
+    description: String,
+    category: String,
+    sideeffect: [String],
+    isactive: Boolean,
+    price: Number,
+    unitprice: String,
+});
+
+//laboratory schema
+const Laboratory = new mongoose.Schema({
+    patientid: String,
+    doctorid: String,
+    testtype: String,
+    testcode: String,
+    testname: String,
+    orderdate: { type: Date, default: Date.now },
+    collectdate: { type: Date, default: Date.now },
+    statusresults: String,
+    notes: String,
+});
+
+//billing schema
+const Billing = new mongoose.Schema({
+    patientid: String,
+    billid: String,
+    appointmentid: String,
+    billdate: { type: Date, default: Date.now },
+    price: Number,
+    category: String,
+    description: String,
+    tax: Number,
+    totalamount: Number,
+    paymentmethod: String
+});
+
+//staff schema
+const staff = new mongoose.Schema({
+    staffId: String,
+    firstName: String,
+    lastName: String,
+    dateOfBirth: Date,
+    gender: String,
+    department: String,
+    employeeType: String,
+    Phone: String,
+    email: String,
+    hiredate: Date,
+    salary: String
+});
+
+//collection schema
+const collection = new mongoose.Schema({
+    itemid: String,
+    category: String,
+    name: String,
+    description: String,
+    purchaseDate: Date,
+    model: String,
+    location: String,
+    warrantyExpiry: Date,
+    purchasePrice: String
+});
+
 
 const Patient = mongoose.model('Patient', patient);
 const Doctor = mongoose.model('Doctor', doctor);
 const Appointment = mongoose.model('Appointment', appointment);
 const MedicalRecord = mongoose.model('MedicalRecord', medicalRecord);
 const Department = mongoose.model('Department', department);
+
+const Medication = mongoose.model('Medication', Medications);
+const LabTest = mongoose.model('LabTest', Laboratory);
+const Bill = mongoose.model('Bill', Billing);
+const Staff = mongoose.model('Staff', staff);
+const Collection = mongoose.model('Collection', collection);
 
 //insertion
 async function insertManyPatient() {
@@ -455,11 +531,375 @@ try{
 }catch(error){console.log("error deleting patient");}   
 }
 async function deletebyiddoctor(doctorId){
-try{ 
+try{
     await Doctor.findOneAndDelete({doctorId:doctorId});
     console.log("Doctor deleted successfully");
 }catch(error){console.log("error deleting doctor");}
 }
+
+async function insertManyMedication() {
+    try {
+        const medications = [
+            {
+                medicationId: "M001",
+                name: "Aspirin",
+                type: "Tablet",
+                strength: "100mg",
+                description: "Pain reliever",
+                category: "Analgesic",
+                sideeffect: ["Stomach upset", "Bleeding"],
+                isactive: true,
+                price: 5.99,
+                unitprice: "per tablet"
+            },
+            {
+                medicationId: "M002",
+                name: "Ibuprofen",
+                type: "Tablet",
+                strength: "200mg",
+                description: "Anti-inflammatory",
+                category: "NSAID",
+                sideeffect: ["Nausea", "Dizziness"],
+                isactive: true,
+                price: 7.49,
+                unitprice: "per tablet"
+            },
+            {
+                medicationId: "M003",
+                name: "Paracetamol",
+                type: "Tablet",
+                strength: "500mg",
+                description: "Fever reducer",
+                category: "Analgesic",
+                sideeffect: ["Liver damage"],
+                isactive: true,
+                price: 4.99,
+                unitprice: "per tablet"
+            }
+        ];
+        await Medication.insertMany(medications);
+        console.log("Medications inserted successfully");
+    } catch (error) {
+        console.error("Error inserting medications:", error);
+    }
+}
+
+async function updateMedication(medicationId) {
+    try {
+        await Medication.findOneAndUpdate(
+            { medicationId: medicationId },
+            { $set: { price: 6.99, isactive: false } }
+        );
+        console.log('Medication updated successfully.');
+    } catch (error) {
+        console.error('Error updating medication:', error);
+    }
+}
+
+async function findbyidandreadmedication(medicationId) {
+    try {
+        const found = await Medication.findOne({ medicationId: medicationId });
+        if (!found) {
+            console.log("Medication not found");
+        } else {
+            console.log("The medication is:", found);
+        }
+    } catch (error) {
+        console.log("Error reading medication:", error);
+    }
+}
+
+// Staff functions
+async function insertManyStaff() {
+    try {
+        const staffs = [
+            {
+                staffId: "S001",
+                firstName: "John",
+                lastName: "Doe",
+                dateOfBirth: new Date('1985-05-15'),
+                gender: "Male",
+                department: "Nursing",
+                employeeType: "Nurse",
+                Phone: "123-456-7890",
+                email: "john.doe@hospital.com",
+                hiredate: new Date('2010-01-01'),
+                salary: "50000"
+            },
+            {
+                staffId: "S002",
+                firstName: "Jane",
+                lastName: "Smith",
+                dateOfBirth: new Date('1990-08-20'),
+                gender: "Female",
+                department: "Administration",
+                employeeType: "Admin",
+                Phone: "234-567-8901",
+                email: "jane.smith@hospital.com",
+                hiredate: new Date('2015-03-15'),
+                salary: "45000"
+            },
+            {
+                staffId: "S003",
+                firstName: "Mike",
+                lastName: "Johnson",
+                dateOfBirth: new Date('1980-12-10'),
+                gender: "Male",
+                department: "IT",
+                employeeType: "Technician",
+                Phone: "345-678-9012",
+                email: "mike.johnson@hospital.com",
+                hiredate: new Date('2008-07-20'),
+                salary: "55000"
+            }
+        ];
+        await Staff.insertMany(staffs);
+        console.log("Staff inserted successfully");
+    } catch (error) {
+        console.error("Error inserting staff:", error);
+    }
+}
+
+async function updateStaff(staffId) {
+    try {
+        await Staff.findOneAndUpdate(
+            { staffId: staffId },
+            { $set: { salary: "60000", department: "HR" } }
+        );
+        console.log('Staff updated successfully.');
+    } catch (error) {
+        console.error('Error updating staff:', error);
+    }
+}
+
+async function findbyidandreadstaff(staffId) {
+    try {
+        const found = await Staff.findOne({ staffId: staffId });
+        if (!found) {
+            console.log("Staff not found");
+        } else {
+            console.log("The staff is:", found);
+        }
+    } catch (error) {
+        console.log("Error reading staff:", error);
+    }
+}
+
+// Collection functions
+async function insertManyCollection() {
+    try {
+        const collections = [
+            {
+                itemid: "C001",
+                category: "Equipment",
+                name: "X-Ray Machine",
+                description: "Medical imaging device",
+                purchaseDate: new Date('2020-01-15'),
+                model: "XR-100",
+                location: "Radiology Room",
+                warrantyExpiry: new Date('2025-01-15'),
+                purchasePrice: "50000"
+            },
+            {
+                itemid: "C002",
+                category: "Furniture",
+                name: "Hospital Bed",
+                description: "Adjustable patient bed",
+                purchaseDate: new Date('2019-06-10'),
+                model: "HB-200",
+                location: "Ward A",
+                warrantyExpiry: new Date('2024-06-10'),
+                purchasePrice: "2000"
+            },
+            {
+                itemid: "C003",
+                category: "Supplies",
+                name: "Syringe Set",
+                description: "Disposable syringes",
+                purchaseDate: new Date('2023-03-05'),
+                model: "SS-50",
+                location: "Storage Room",
+                warrantyExpiry: new Date('2024-03-05'),
+                purchasePrice: "100"
+            }
+        ];
+        await Collection.insertMany(collections);
+        console.log("Collections inserted successfully");
+    } catch (error) {
+        console.error("Error inserting collections:", error);
+    }
+}
+
+async function updateCollection(itemid) {
+    try {
+        await Collection.findOneAndUpdate(
+            { itemid: itemid },
+            { $set: { location: "New Location", purchasePrice: "60000" } }
+        );
+        console.log('Collection updated successfully.');
+    } catch (error) {
+        console.error('Error updating collection:', error);
+    }
+}
+
+async function findbyidandreadcollection(itemid) {
+    try {
+        const found = await Collection.findOne({ itemid: itemid });
+        if (!found) {
+            console.log("Collection item not found");
+        } else {
+            console.log("The collection item is:", found);
+        }
+    } catch (error) {
+        console.log("Error reading collection:", error);
+    }
+}
+
+// Laboratory (LabTest) functions
+async function insertManyLabTest() {
+    try {
+        const labTests = [
+            {
+                patientid: "P001",
+                doctorid: "D001",
+                testtype: "Blood Test",
+                testcode: "BT001",
+                testname: "Complete Blood Count",
+                orderdate: new Date(),
+                collectdate: new Date(),
+                statusresults: "Pending",
+                notes: "Routine check"
+            },
+            {
+                patientid: "P002",
+                doctorid: "D002",
+                testtype: "Urine Test",
+                testcode: "UT001",
+                testname: "Urinalysis",
+                orderdate: new Date(),
+                collectdate: new Date(),
+                statusresults: "Completed",
+                notes: "Normal results"
+            },
+            {
+                patientid: "P003",
+                doctorid: "D003",
+                testtype: "X-Ray",
+                testcode: "XR001",
+                testname: "Chest X-Ray",
+                orderdate: new Date(),
+                collectdate: new Date(),
+                statusresults: "In Progress",
+                notes: "Follow-up required"
+            }
+        ];
+        await LabTest.insertMany(labTests);
+        console.log("Lab tests inserted successfully");
+    } catch (error) {
+        console.error("Error inserting lab tests:", error);
+    }
+}
+
+async function updateLabTest(testcode) {
+    try {
+        await LabTest.findOneAndUpdate(
+            { testcode: testcode },
+            { $set: { statusresults: "Completed", notes: "Updated notes" } }
+        );
+        console.log('Lab test updated successfully.');
+    } catch (error) {
+        console.error('Error updating lab test:', error);
+    }
+}
+
+async function findbyidandreadlabtest(testcode) {
+    try {
+        const found = await LabTest.findOne({ testcode: testcode });
+        if (!found) {
+            console.log("Lab test not found");
+        } else {
+            console.log("The lab test is:", found);
+        }
+    } catch (error) {
+        console.log("Error reading lab test:", error);
+    }
+}
+
+// Billing functions
+async function insertManyBill() {
+    try {
+        const bills = [
+            {
+                patientid: "P001",
+                billid: "B001",
+                appointmentid: "A001",
+                billdate: new Date(),
+                price: 100,
+                category: "Consultation",
+                description: "Doctor visit",
+                tax: 10,
+                totalamount: 110,
+                paymentmethod: "Cash"
+            },
+            {
+                patientid: "P002",
+                billid: "B002",
+                appointmentid: "A002",
+                billdate: new Date(),
+                price: 150,
+                category: "Treatment",
+                description: "Medication",
+                tax: 15,
+                totalamount: 165,
+                paymentmethod: "Credit Card"
+            },
+            {
+                patientid: "P003",
+                billid: "B003",
+                appointmentid: "A003",
+                billdate: new Date(),
+                price: 200,
+                category: "Surgery",
+                description: "Minor surgery",
+                tax: 20,
+                totalamount: 220,
+                paymentmethod: "Insurance"
+            }
+        ];
+        await Bill.insertMany(bills);
+        console.log("Bills inserted successfully");
+    } catch (error) {
+        console.error("Error inserting bills:", error);
+    }
+}
+
+async function updateBill(billid) {
+    try {
+        await Bill.findOneAndUpdate(
+            { billid: billid },
+            { $set: { totalamount: 120, paymentmethod: "Online" } }
+        );
+        console.log('Bill updated successfully.');
+    } catch (error) {
+        console.error('Error updating bill:', error);
+    }
+}
+
+async function findbyidandreadbill(billid) {
+    try {
+        const found = await Bill.findOne({ billid: billid });
+        if (!found) {
+            console.log("Bill not found");
+        } else {
+            console.log("The bill is:", found);
+        }
+    } catch (error) {
+        console.log("Error reading bill:", error);
+    }
+}
+
+
+
 
 
 
@@ -478,8 +918,8 @@ app.get('/', (req, res) => {
 const connectDB = async () => {
     try {
         await mongoose.connect(url);
-        console.log('✅MongoDB connection successful!');
-        
+        console.log('MongoDB connection successful!');
+
         app.listen(port, () => {
             console.log(` Server running on port ${port}`);
         });
@@ -488,24 +928,39 @@ const connectDB = async () => {
         await insertMnyAppointment();
         await insertManyMedicalRecord();
         await insertManydepartment();
-        
+        await insertManyMedication();
+        await insertManyStaff();
+        await insertManyCollection();
+        await insertManyLabTest();
+        await insertManyBill();
+
         console.log("All data inserted successfully!");
 
-        
+
         await updatePatient("P001");
         await findByIdAndUpdateDepartment("DEP001");
         await findByIdAndUpdateAppointment("A001");
-        await findbyidandreadpat("P001");  
+        await updateMedication("M001");
+        await updateStaff("S001");
+        await updateCollection("C001");
+        await updateLabTest("BT001");
+        await updateBill("B001");
+        await findbyidandreadpat("P001");
         await findbyidandreaddoc("D001");
-        await findbyidandreaddep("DEP001");  
-        await findbyidandreadapp("A001");   
-    
+        await findbyidandreaddep("DEP001");
+        await findbyidandreadapp("A001");
+        await findbyidandreadmedication("M001");
+        await findbyidandreadstaff("S001");
+        await findbyidandreadcollection("C001");
+        await findbyidandreadlabtest("BT001");
+        await findbyidandreadbill("B001");
+
         await findbyidandreadmed("MR001");
               console.log("Testing deletion...");
-        await deletebyidpatient("P003");  
-        await deletebyiddoctor("D001");   
+        await deletebyidpatient("P003");
+        await deletebyiddoctor("D001");
     } catch (err) {
-        console.error('❌ MongoDB connection error:', err.message);
+        console.error('MongoDB connection error:', err.message);
         process.exit(1);
     }
 };
