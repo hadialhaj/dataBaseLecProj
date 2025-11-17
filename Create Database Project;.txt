@@ -80,6 +80,69 @@ date Date ,
 payment_status varchar(50) check(payment_status IN ('Payed','Pending'))  NOT NULL
  );
 
+
+ CREATE TABLE Rooms (
+    room_id INT  PRIMARY KEY,
+    daily_rate VARCHAR(10) NOT NULL,
+    room_type VARCHAR(50) NOT NULL,
+    status VARCHAR(20) NOT NULL
+);
+
+create table Payments(
+payment_id int primary key,
+amount_paid money not null,
+method varchar(50) not null,
+payment_date DATE not null,
+invoice_id varchar(50) foreign key (invoice_id) references Invoice(invoice_id)
+
+);
+
+CREATE TABLE admissions(
+    admission_id INT  PRIMARY KEY,
+    admission_date DATE ,
+    discharge_date VARCHAR(50),
+    patient_id varchar(50) foreign key (patient_id) references Patient(patient_id) ,
+    room_id INT FOREIGN KEY (room_id) REFERENCES rooms(room_id)
+,
+    
+);
+
+CREATE TABLE Lab_Test(
+   test_id INT PRIMARY KEY,
+    test_name VARCHAR(50) NOT NULL,
+    result VARCHAR(50) NOT NULL,
+    cost money NOT NULL,
+    appointment_id varchar(50) FOREIGN KEY (appointment_id) REFERENCES Appointment(appointment_id)
+);
+
+CREATE TABLE Lab_Technician (
+    tech_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) ,
+    specialization VARCHAR(100) 
+);
+
+CREATE TABLE lab_report (
+    report_id INT NOT NULL PRIMARY KEY,
+    report_date DATE NOT NULL,
+    notes VARCHAR(255),
+    tech_id INT FOREIGN KEY (tech_id) REFERENCES Lab_Technician(tech_id),
+    
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 INSERT INTO Insurance (insurance_id, company_name, policy_number, coverage_percent)
 VALUES
@@ -162,6 +225,57 @@ VALUES
 ('4003', '3', '1003', 180.00, '2025-11-22', 'Payed'),
 ('4004', '4', '1004', 120.00, '2025-11-23', 'Pending'),
 ('4005', '5', '1005',  50.00, '2025-11-24', 'Pending'); 
+
+INSERT INTO Rooms (room_id, daily_rate, room_type, status) VALUES
+(101, '$250', 'Private Room', 'Occupied'),
+(102, '$200', 'Semi-Private', 'Available'),
+(103, '$300', 'ICU', 'Occupied'),
+(104, '$180', 'Standard', 'Available'),
+(105, '$400', 'VIP Suite', 'Occupied');
+
+
+
+INSERT INTO Payments (payment_id, amount_paid, method, payment_date, invoice_id) VALUES
+(1, '$500.00', 'Credit Card', '2024-01-15', 'INV001'),
+(2, '$250.00', 'Cash', '2024-01-16', 'INV002'),
+(3, '$750.00', 'Insurance', '2024-01-17', 'INV003'),
+(4, '$300.00', 'Debit Card', '2024-01-18', 'INV004'),
+(5, '$450.00', 'Bank Transfer', '2024-01-19', 'INV005');
+
+INSERT INTO admissions (admission_id, admission_date, discharge_date, patient_id, room_id) VALUES
+(1, '2024-01-10', '2024-01-15', 'P001', 101),
+(2, '2024-01-12', 'Pending', 'P002', 103),
+(3, '2024-01-14', '2024-01-20', 'P003', 105),
+(4, '2024-01-16', 'Pending', 'P004', 102),
+(5, '2024-01-18', 'Pending', 'P005', 104);
+
+
+INSERT INTO Lab_Test (test_id, test_name, result, cost, appointment_id) VALUES
+(1, 'Blood Test', 'Normal', '$75.00', 'APT001'),
+(2, 'MRI Scan', 'Clear', '$500.00', 'APT002'),
+(3, 'Urine Analysis', 'Abnormal', '$50.00', 'APT003'),
+(4, 'X-Ray Chest', 'Normal', '$120.00', 'APT004'),
+(5, 'ECG', 'Regular', '$90.00', 'APT005');
+
+
+
+
+
+INSERT INTO Lab_Technician (tech_id, name, phone, specialization) VALUES
+(1, 'Dr. Sarah Johnson', '555-0101', 'Hematology'),
+(2, 'Mike Chen', '555-0102', 'Radiology'),
+(3, 'Emily Davis', '555-0103', 'Microbiology'),
+(4, 'Robert Wilson', '555-0104', 'Pathology'),
+(5, 'Lisa Martinez', '555-0105', 'Biochemistry');
+INSERT INTO lab_report (report_id, report_date, notes, tech_id) VALUES
+(1, '2024-01-15', 'Complete blood count within normal ranges', 1),
+(2, '2024-01-16', 'MRI shows no abnormalities detected', 2),
+(3, '2024-01-17', 'Urine culture positive for infection', 3),
+(4, '2024-01-18', 'Chest X-ray clear, no pneumonia', 4),
+(5, '2024-01-19', 'ECG shows normal sinus rhythm', 5);
+
+
+
 
 
 
