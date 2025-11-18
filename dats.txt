@@ -1,0 +1,106 @@
+public class Node {
+Node next;
+Action data;
+
+    public Node( Action data) {
+        this.next = next;
+        this.data = null;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
+    }
+
+    public Action getData() {
+        return data;
+    }
+
+    public void setData(Action data) {
+        this.data = data;
+    }
+
+   
+    
+    
+}
+
+public class ActionStack {
+    Node top;
+
+    public ActionStack() {
+        this.top = null;
+    }
+    
+    void push(Action action){
+       Node n=new Node(action);
+       if(top==null){
+           top=n;
+       }
+       else{
+       top.setNext(n);
+       top=n;
+       }
+        
+        
+        
+    }
+    
+    Action pop()
+    {
+        
+        if(top==null){
+            System.out.println("no data is found");
+        }
+        Action temp=top.getData();
+        top=top.getNext();
+        
+        return temp;
+        
+    }    
+    
+    
+    
+    
+}
+
+
+public class Action {
+    enum ActionType{
+        Add,delete,update
+    }
+    
+    ActionType type;
+    Patient oldData;
+    Patient newData;
+
+    
+    
+            
+    public Action(ActionType type, Patient newData) {
+        this.type = type;
+        this.newData = newData;
+    }
+    
+    public Action(ActionType type, Patient oldData, boolean isdel) {
+        this.type = type;
+        this.oldData = oldData;
+    }
+    
+    
+     public Action(ActionType type, Patient oldData,Patient newData) {
+        this.type = type;
+        this.oldData = oldData;
+        this.newData=newData;
+    }
+    
+    
+    
+    
+    
+    
+    
+}
